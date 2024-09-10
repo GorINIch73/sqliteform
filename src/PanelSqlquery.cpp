@@ -1,17 +1,25 @@
 
 #include "PanelSqlquery.h"
 #include "GBase.h"
+#include <wx/gdicmn.h>
 
-#include <iostream>
-#include <wx/wxsqlite3.h>
+// #include <iostream>
+// #include <wx/wxsqlite3.h>
 
 using namespace std;
 
-// #include "../img/home_32.xpm"
+#include "../img/first.xpm"
+#include "../img/last.xpm"
+#include "../img/next.xpm"
+#include "../img/previous.xpm"
+// #include "../img/add.xpm"
+// #include "../img/delete.xpm"
+#include "../img/close.xpm"
+#include "../img/update.xpm"
 
-// const int ID_RUN = 105;
+// const int ID_FIRST = 105;
 
-PanelSQLQuery::PanelSQLQuery(wxPanel *parent)
+PanelSQLQuery::PanelSQLQuery(wxPanel *parent, GBase *pbase, wxString pQuery)
     : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(270, 150),
               wxBORDER_SUNKEN) {
   //    m_text = new wxStaticText(this,-1,wxT("0"),wxPoint(40,60));
@@ -21,83 +29,101 @@ PanelSQLQuery::PanelSQLQuery(wxPanel *parent)
   //    m_TextCtrlSqlQuery->SetValue("SELECT * from bank");
   //    TextQuery = wxT("SELECT * from bank");     //
   //    m_SqlQueryTextCtrl->SetToolTip(_("Enter SQL query"));
-
-  TextQuery = wxT("SELECT counterparties.counterparty, 'N ' || \
-        contracts.contract_number, contracts.contract_date,\
-        contracts.for_check, ROUND(SUM(sum),2), COUNT(DISTINCT bank.id),\
-        articles.article, contracts.note  FROM bank_decryption inner join\
-        contracts on bank_decryption.contract_id=contracts.id inner join\
-        articles on bank_decryption.article_id=articles.id inner join bank\
-        on bank_decryption.bank_id=bank.id inner join counterparties on \
-        contracts.counterparty_id =counterparties.id WHERE\
-        contracts.for_audit GROUP BY counterparties.counterparty,\
-        contracts.contract_number, \
-        contracts.contract_date, articles.article ORDER BY \
-        contracts.contract_date, contracts.contract_number");
-
   // TextQuery = wxT("SELECT * FROM bank");
 
-  // base = new GBase(wxT("./base.db"));
-  base = new GBase(wxT("./ngkb0012.dbad"));
+  // запоминаем параметры
+  TextQuery = pQuery;
+  base = pbase;
 
   //    m_ButtonSqlGo = new wxBitmapButton( this, ID_RUN,
-  //    wxBitmap(_home_32_xpm), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW
+  //    wxBitmap(_home_32_xpm), wxDefaultPosition, wxDefaultSize,
+  //    wxBU_AUTODRAW
   //    );
   // folderAddBitmapButton->SetToolTip(_("Add new subfolder"));
   // folderControlBoxSizer->Add(folderAddBitmapButton, 0,
   // wxALIGN_CENTER_VERTICAL|wxALL, 3); m_ListBoxResult= new
   // wxListBox(this,wxID_ANY,wxDefaultPosition,wxDefaultSize);
-  m_GridResult = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
-  // m_GridResult = new wxGrid( this,-1,wxPoint( 0, 0 ),wxSize( 400, 300 ) );
-  // m_GridResult = new wxGrid( NULL,-1);
+  wxBoxSizer *bSizerMain;
+  bSizerMain = new wxBoxSizer(wxVERTICAL);
+  // bSizerMain->SetMinSize(FromDIP(400), wxDefaultSize.GetHeight()); // не
+  //                                                                  //
+  //                                                                  работает
+  // bSizerMain->SetMinSize(FromDIP(wxSize(800, 600)));
+  bSizerMain->SetMinSize(wxSize(800, 600));
 
-  // wxGrid *grid = new wxGrid( this, -1,wxPoint( 0, 0 ), wxSize( 400, 300 ) );
+  wxBoxSizer *bSizerBar;
+  bSizerBar = new wxBoxSizer(wxHORIZONTAL);
 
-  // wxPanel *panel = new wxPanel(this,wxID_ANY) ;
-  wxBoxSizer *hbox = new wxBoxSizer(wxVERTICAL);
-  //    hbox->Add(m_text,0,wxEXPAND|wxALL,5);
-  //    hbox->Add(m_TextCtrlSqlQuery,0,wxEXPAND|wxALL,2);
-  //    hbox->Add(m_ButtonSqlGo,0,wxEXPAND|wxALL,2);
-  hbox->Add(m_GridResult, 1, wxEXPAND | wxALL, 2);
+  wxBitmap bb;
 
-  // Connect(wxEVT_COMMAND_LISTBOX_DOUBLECLICKED,wxCommandEventHandler(Listbox::OnDblClick))
-  // ;
-  // Connect(wxID_NEW,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(MyPanel::OnNew));
+  m_bpButtonFirst =
+      new wxBitmapButton(this, wxID_ANY, wxBitmap(_first_xpm),
+                         wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW | 0);
+  bSizerBar->Add(m_bpButtonFirst, 0, wxALL, 5);
 
-  // m_GridResult->CreateGrid( 10, 10 );
-  //  //m_GridResult->SetTable();
-  //  m_GridResult->InsertRows(0,10);
-  //  // We can set the sizes of individual rows and columns
-  //  // in pixels
-  //  m_GridResult->SetRowSize( 0, 60 );
-  //  m_GridResult->SetColSize( 0, 120 );
-  //  // And set grid cell contents as strings
-  //  m_GridResult->SetCellValue( 0, 0, "wxGrid is good" );
-  //  // We can specify that some cells are read->only
-  //  m_GridResult->SetCellValue( 0, 3, "This is read->only" );
-  //  m_GridResult->SetReadOnly( 0, 3 );
-  //  // Colours can be specified for grid cell contents
-  //  m_GridResult->SetCellValue(3, 3, "green on grey");
-  //  m_GridResult->SetCellTextColour(3, 3, *wxGREEN);
-  //  m_GridResult->SetCellBackgroundColour(3, 3, *wxLIGHT_GREY);
-  //  // We can specify the some cells will store numeric
-  //  // values rather than strings. Here we set grid column 5
-  //  // to hold floating point values displayed with width of 6
-  //  // and precision of 2
-  //  m_GridResult->SetColFormatFloat(5, 6, 2);
-  //  m_GridResult->SetCellValue(0, 6, "3.1415");
+  m_bpButtonLast =
+      new wxBitmapButton(this, wxID_ANY, wxBitmap(_last_xpm), wxDefaultPosition,
+                         wxDefaultSize, wxBU_AUTODRAW | 0);
+  bSizerBar->Add(m_bpButtonLast, 0, wxALL, 5);
 
-  // wxString str=wxGetTextFromUser(wxT("Addnewitem"));
-  // if(str.Len()>0)
-  //     m_ListBoxResult->Append(str);
-  SetSizer(hbox);
+  m_bpButtonPrevious =
+      new wxBitmapButton(this, wxID_ANY, wxBitmap(_previous_xpm),
+                         wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW | 0);
+  bSizerBar->Add(m_bpButtonPrevious, 0, wxALL, 5);
 
-  // wxSQLite3Database::InitializeSQLite();
+  m_bpButtonNext =
+      new wxBitmapButton(this, wxID_ANY, wxBitmap(_next_xpm), wxDefaultPosition,
+                         wxDefaultSize, wxBU_AUTODRAW | 0);
+  bSizerBar->Add(m_bpButtonNext, 0, wxALL, 5);
 
-  // database = new wxSQLite3Database();
+  bSizerBar->Add(0, 0, 1, wxEXPAND, 5);
+
+  m_bpButtonClose =
+      new wxBitmapButton(this, wxID_ANY, wxBitmap(_close_xpm),
+                         wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW | 0);
+  bSizerBar->Add(m_bpButtonClose, 0, wxALL, 5);
+
+  bSizerMain->Add(bSizerBar, 0, wxEXPAND, 2);
+
+  m_GridResult =
+      new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
+
+  // m_grid1 = new wxGrid( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0
+  // );
+
+  // Grid
+  m_GridResult->EnableEditing(true);
+  m_GridResult->EnableGridLines(true);
+  m_GridResult->EnableDragGridSize(false);
+  m_GridResult->SetMargins(0, 0);
+
+  // Columns
+  m_GridResult->EnableDragColMove(false);
+  m_GridResult->EnableDragColSize(true);
+  m_GridResult->SetColLabelAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
+
+  // Rows
+  m_GridResult->EnableDragRowSize(true);
+  m_GridResult->SetRowLabelAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
+
+  // Label Appearance
+
+  // Cell Defaults
+  m_GridResult->SetDefaultCellAlignment(wxALIGN_LEFT, wxALIGN_TOP);
+  bSizerMain->Add(m_GridResult, 1, wxALL, 5);
+
+  // таблица
+  // вертикальный сайзер
+  //  wxBoxSizer *hbox = new wxBoxSizer(wxVERTICAL);
+  // hbox->Add(m_BtFirst, 0, wxEXPAND | wxALL, 2);
+  //  hbox->Add(m_GridResult, 1, wxEXPAND | wxALL, 2);
+
+  // SetSizer(hbox);
 
   //        Connect(ID_RUN,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(PanelSQLQuery::OnRun));
+  this->SetSizer(bSizerMain);
   OnRun();
+  this->Layout();
 }
 /*
 void PanelSQLQuery::OnSetText(wxCommandEvent& event)
@@ -154,7 +180,8 @@ void PanelSQLQuery::OnRun() {
     int count = 0;
 
     //    m_GridResult->CreateGrid( 0, Res.GetColumnCount() );  //временно
-    m_GridResult->ClearGrid();
+
+    // m_GridResult->ClearGrid();
 
     int numCol = Res.GetColumnCount();
     if (numCol > 0) {

@@ -2,8 +2,8 @@
 #include <wx/wx.h>
 #include <wx/wxprec.h>
 
+#include "GBase.h"
 #include "PanelSqlquery.h"
-// #include "GBase.h"
 
 class MainWindow : public wxFrame {
 public:
@@ -11,6 +11,8 @@ public:
 
   void OnQuit(wxCommandEvent &WXUNUSED(event));
   // void BaseConnect(wxString name);
+
+  GBase *base;
 
   PanelSQLQuery *m_p;
 

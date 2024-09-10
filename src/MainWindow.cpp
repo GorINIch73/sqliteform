@@ -1,7 +1,7 @@
 #include <wx/icon.h>
 
+#include "../img/close.xpm"
 #include "../img/home_32.xpm"
-#include "../img/quit.xpm"
 #include "MainWindow.h"
 #include "PanelSqlquery.h"
 
@@ -49,8 +49,8 @@ MainWindow::MainWindow(const wxString &title)
   SetMenuBar(menubar);
 
   // wxBitmap exit(_quit_xpm);
-  wxImage img(_quit_xpm);
-  img.Rescale(28, 32);
+  wxImage img(_close_xpm);
+  // img.Rescale(2, 32);
 
   wxToolBar *toolbar = CreateToolBar();
   toolbar->AddTool(wxID_EXIT, wxT("Exitapplication"), img);
@@ -64,8 +64,25 @@ MainWindow::MainWindow(const wxString &title)
   wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 
   // панель запроса ---------------------------------------------------------
+
   // BaseConnect("./ngkb0012.dbad");
-  m_p = new PanelSQLQuery(panel);
+  base = new GBase(wxT("./ngkb0012.dbad"));
+
+  wxString TextQuery;
+  TextQuery = wxT("SELECT counterparties.counterparty, 'N ' || \
+        contracts.contract_number, contracts.contract_date,\
+        contracts.for_check, ROUND(SUM(sum),2), COUNT(DISTINCT bank.id),\
+        articles.article, contracts.note  FROM bank_decryption inner join\
+        contracts on bank_decryption.contract_id=contracts.id inner join\
+        articles on bank_decryption.article_id=articles.id inner join bank\
+        on bank_decryption.bank_id=bank.id inner join counterparties on \
+        contracts.counterparty_id =counterparties.id WHERE\
+        contracts.for_audit GROUP BY counterparties.counterparty,\
+        contracts.contract_number, \
+        contracts.contract_date, articles.article ORDER BY \
+        contracts.contract_date, contracts.contract_number");
+
+  m_p = new PanelSQLQuery(panel, base, TextQuery);
   // m_p = new PanelSQLQuery(panel);
   // m_rp = new rightPanel(panel);
   //

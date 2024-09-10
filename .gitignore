@@ -13,6 +13,7 @@
 !*.ico
 !*.db
 !*.md
+!*.fbp
 !lib/*
 CMakeFiles/
 out/

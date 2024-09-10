@@ -12,24 +12,30 @@
 #include "GBase.h"
 
 class PanelSQLQuery : public wxPanel {
+
+protected:
+  wxBitmapButton *m_bpButtonFirst;
+  wxBitmapButton *m_bpButtonLast;
+  wxBitmapButton *m_bpButtonNext;
+  wxBitmapButton *m_bpButtonPrevious;
+  wxBitmapButton *m_bpButtonClose;
+
+  wxGrid *m_GridResult;
+
+  GBase *base;
+  wxString TextQuery;
+
+  //   void OnRun(wxCommandEvent& event) ;
+  void OnRun();
+
 public:
-  PanelSQLQuery(wxPanel *parent);
+  PanelSQLQuery(wxPanel *parent, GBase *pbase, wxString pQuery);
   // PanelSQLQuery(wxPanel *parent, wxSQLite3Database db, wxString tQuery);
   //  void OnSetText (wxCommandEvent& event) ;
 
   // wxStaticText *m_text ;
 
   // wxTextCtrl *m_TextCtrlSqlQuery;
-  // wxBitmapButton* m_ButtonSqlGo;
-
-  GBase *base;
-  // wxSQLite3Database *database;
-
-  wxGrid *m_GridResult;
-  wxString TextQuery;
-
-  //   void OnRun(wxCommandEvent& event) ;
-  void OnRun();
   // void goQuery();
 };
 
